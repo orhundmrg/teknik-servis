@@ -182,7 +182,7 @@ else:
     secilen_id = st.selectbox(
         "İşlem Yapılacak Cihazı Seçin (ID - Müşteri - Model)", 
         [c['id'] for c in cihazlar],
-        format_func=lambda x: f"ID: #{x} | " + " - ".join([str(c['musteri_adi']), str(c['cihaz_model']), str(c['durum'])]) for c in cihazlar if c['id'] == x
+        format_func=lambda x: next((f"ID: #{c['id']} | {c['musteri_adi']} - {c['cihaz_model']} - {c['durum']}" for c in cihazlar if c['id'] == x), str(x))
     )
     
     secili_c = next(c for c in cihazlar if c['id'] == secilen_id)
