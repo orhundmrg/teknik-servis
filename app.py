@@ -83,7 +83,7 @@ with col_head2:
 
 st.divider()
 
-# --- SOL / ÜST KISIM: YENİ CİHAZ EKLEME & FİLTRELER ---
+# --- YENİ CİHAZ KAYDI ---
 with st.expander("➕ Yeni Cihaz Kaydı Oluştur", expanded=False):
     sube_listesi = subeleri_getir()
     with st.form("yeni_cihaz_form"):
@@ -158,8 +158,8 @@ if arama_sorgusu:
 if not cihazlar:
     st.info("Listelenecek kayıt bulunamadı.")
 else:
-    # 1. TÜM KAYITLARI TABLO OLARAK GÖSTER
-    st.dataframe(
+    # TABLO ÜZERINDEN SATIR SEÇİMİ
+    tablo_secimi = st.dataframe(
         cihazlar,
         column_config={
             "id": "ID",
@@ -172,20 +172,23 @@ else:
             "kayit_tarihi": "Kayıt Tarihi"
         },
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
+        selection_mode="single-row",
+        on_select="rerun"
     )
     
+    # Seçilen satırı yakala
+    secilen_satirlar = tablo_secimi.selection.rows if hasattr(tablo_secimi, "selection") else []
+    
+    if secilen_satirlar:
+        secili_index = secilen_satirlar[0]
+        secili_c = cihazlar[secili_index]
+    else:
+        secili_c = cihazlar[0]
+        st.caption("💡 İpucu: Detaylarını görmek istediğiniz cihazın üzerine tabloda tıklayabilirsiniz.")
+
     st.markdown("---")
-    st.markdown("### ⚙️ Cihaz Detayı ve İşlemler")
-    
-    # İşlem yapılacak cihazı ID'ye göre seçme
-    secilen_id = st.selectbox(
-        "İşlem Yapılacak Cihazı Seçin (ID - Müşteri - Model)", 
-        [c['id'] for c in cihazlar],
-        format_func=lambda x: next((f"ID: #{c['id']} | {c['musteri_adi']} - {c['cihaz_model']} - {c['durum']}" for c in cihazlar if c['id'] == x), str(x))
-    )
-    
-    secili_c = next(c for c in cihazlar if c['id'] == secilen_id)
+    st.markdown(f"### ⚙️ Cihaz Detayı ve İşlemler (Seçilen: #{secili_c['id']} - {secili_c['musteri_adi']})")
 
     col_detay1, col_detay2 = st.columns(2)
     
