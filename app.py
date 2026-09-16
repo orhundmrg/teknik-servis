@@ -4,7 +4,7 @@ from supabase import create_client, Client
 
 # --- SAYFA YAPILANDIRMASI ---
 st.set_page_config(
-    page_title="Şube & Teknik Servis Takip",
+    page_config="Şube & Teknik Servis Takip",
     page_icon="📱",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -158,10 +158,34 @@ if arama_sorgusu:
 if not cihazlar:
     st.info("Listelenecek kayıt bulunamadı.")
 else:
-    # Seçim için tablo gösterimi yerine bir selectbox veya tablo listesi kullanalım
-    cihaz_secenekleri = {f"ID: #{c['id']} | {c['marka']} {c['cihaz_model']} - {c['musteri_adi']} ({c['durum']})": c for c in cihazlar}
-    secilen_etiket = st.selectbox("İşlem Yapılacak Cihazı Seçin", list(cihaz_secenekleri.keys()))
-    secili_c = cihaz_secenekleri[secilen_etiket]
+    # 1. TÜM KAYITLARI TABLO OLARAK GÖSTER
+    st.dataframe(
+        cihazlar,
+        column_config={
+            "id": "ID",
+            "sube": "Şube",
+            "musteri_adi": "Müşteri",
+            "telefon": "Telefon",
+            "marka": "Marka",
+            "cihaz_model": "Model",
+            "durum": "Durum",
+            "kayit_tarihi": "Kayıt Tarihi"
+        },
+        use_container_width=True,
+        hide_index=True
+    )
+    
+    st.markdown("---")
+    st.markdown("### ⚙️ Cihaz Detayı ve İşlemler")
+    
+    # İşlem yapılacak cihazı ID'ye göre seçme
+    secilen_id = st.selectbox(
+        "İşlem Yapılacak Cihazı Seçin (ID - Müşteri - Model)", 
+        [c['id'] for c in cihazlar],
+        format_func=lambda x: f"ID: #{x} | " + " - ".join([str(c['musteri_adi']), str(c['cihaz_model']), str(c['durum'])]) for c in cihazlar if c['id'] == x
+    )
+    
+    secili_c = next(c for c in cihazlar if c['id'] == secilen_id)
 
     col_detay1, col_detay2 = st.columns(2)
     
