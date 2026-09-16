@@ -4,7 +4,7 @@ from supabase import create_client, Client
 
 # --- SAYFA YAPILANDIRMASI ---
 st.set_page_config(
-    page_config="Şube & Teknik Servis Takip",
+    page_title="Şube & Teknik Servis Takip",
     page_icon="📱",
     layout="wide",
     initial_sidebar_state="expanded"
